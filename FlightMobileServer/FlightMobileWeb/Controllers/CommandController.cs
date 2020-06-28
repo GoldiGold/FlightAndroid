@@ -15,7 +15,6 @@ namespace FlightMobileWeb.Controllers
     public class CommandController : ControllerBase
     {
         private IFlightServer ifs;
-        private HttpClient _client;
 
         [HttpPost]
         public ActionResult SendCommand([FromBody] Command c)
@@ -26,6 +25,8 @@ namespace FlightMobileWeb.Controllers
                 // return error 400 badRequest
                 return BadRequest("NOT A GOOD JSON COMMAND FILE.");
             }
+            // TODO: ADD THE AWAIT SEND_COMMAND OF THE SERVER (WITH THE TCP). WE WILL CALL THE SERVER SEND_COMMAND THAT
+            // WILL USE THE TCP IN THE INSIDE. WE WON'T KNOW THE INNER IMPLEMENTATION.
             return Ok();
         }
     }
