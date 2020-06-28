@@ -147,12 +147,9 @@ namespace FlightMobileWeb.Model
 				{
 					socket.GetStream().Close();
 					socket.Client.Close();
-					//socket.Dispose();
-					//socket.Close()/*(SocketShutdown.Both)*/;
 					socket.Close();
 				}
 			}
-			//throw new NotImplementedException();
 		}
 		bool ITelnetClient.Connection { get => connected; set => connected = value; }
 	}
