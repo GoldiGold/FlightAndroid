@@ -11,6 +11,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FlightMobileWeb.Models
 {
+    public enum Result { Ok, NotOk}
     public class Command
     {
         [JsonProperty(PropertyName = "aileron", Required = Required.Always)]
@@ -30,6 +31,35 @@ namespace FlightMobileWeb.Models
         [Range(0, 1)]
         public double Throttle { get; set; }
 
+        public string AileronString()
+        {
+            return "Aileron";
+        }
+        public string RudderString()
+        {
+            return "Rudder";
+        }
+        public string ElevatorString()
+        {
+            return "Elevator";
+        }
+        public string ThrottleString()
+        {
+            return "Throttle";
+        }
+
         public Command() { }
+    }
+
+    public class AsyncCommand
+    {
+        public Command command { get; private set; }
+        public TaskCompletionSource<Result> Completion { get; private set; }
+        public Task<Result> Task { get => Completion.Task; }
+        public AsyncCommand(Command c)
+        {
+            this.command = c;
+            this.Completion = new TaskCompletionSource<Result>(TaskCreationOptions.RunContinuationsAsynchronously);
+        }
     }
 }

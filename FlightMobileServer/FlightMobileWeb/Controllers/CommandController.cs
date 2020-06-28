@@ -10,24 +10,31 @@ using FlightMobileWeb.Models;
 
 namespace FlightMobileWeb.Controllers
 {
-    [Route("api/command")]
-    [ApiController]
-    public class CommandController : ControllerBase
-    {
-        private IFlightServer ifs;
+	[Route("api/command")]
+	[ApiController]
+	public class CommandController : ControllerBase
+	{
+		private IFlightServer ifs;
 
-        [HttpPost]
-        public ActionResult SendCommand([FromBody] Command c)
-        {
-            bool isOk = ifs.isValidCommand(c); // not sure we need it since we use the Json checker extension.
-            if (!isOk)
-            {
-                // return error 400 badRequest
-                return BadRequest("NOT A GOOD JSON COMMAND FILE.");
-            }
-            // TODO: ADD THE AWAIT SEND_COMMAND OF THE SERVER (WITH THE TCP). WE WILL CALL THE SERVER SEND_COMMAND THAT
-            // WILL USE THE TCP IN THE INSIDE. WE WON'T KNOW THE INNER IMPLEMENTATION.
-            return Ok();
-        }
-    }
+		public CommandController(IFlightServer flightServer)
+		{
+			this.ifs = flightServer;
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> SendCommand([FromBody] Command c)
+		{
+			//bool isOk = ifs.isValidCommand(c); // not sure we need it since we use the Json checker extension.
+			if (c == null)
+			{
+				// return error 400 badRequest
+				return BadRequest("NOT A GOOD JSON COMMAND FILE.");
+			}
+			// TODO: ADD THE AWAIT SEND_COMMAND OF THE SERVER (WITH THE TCP). WE WILL CALL THE SERVER SEND_COMMAND THAT
+			// WILL USE THE TCP IN THE INSIDE. WE WON'T KNOW THE INNER IMPLEMENTATION.
+			await this.ifs.Execute(c);
+			
+			return Ok();
+		}
+	}
 }
