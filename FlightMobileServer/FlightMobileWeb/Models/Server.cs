@@ -1,5 +1,6 @@
 ﻿using FlightMobileWeb.Model;
 using FlightMobileWeb.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace FlightMobileWeb.Servers
 		private ConcurrentDictionary<string, Pair<double, string>> _valuesDict; //a dictionary build like: <name, <value, path>>.
 		private string _toScreenshot;
 		private string _ip;
-		private int _port;
+		private int _httpPort, _tcpPort;
 		private BlockingCollection<AsyncCommand> _queue;
 		public const double ailronPrecent = 0.02;
 		public const double rudderPrecent = 0.02;
@@ -36,20 +37,24 @@ namespace FlightMobileWeb.Servers
 		/// values of the command object.</param>
 		/// <param name="ip"> the ip of the FG server to connect</param>
 		/// <param name="httpPort"> the port of the FG server to connect</param>
-		public Server(ITelnetClient telnetClient, string ip, int httpPort)
+		public Server(/*ITelnetClient telnetClient,string ip, int httpPort,*/ IConfiguration con)
 		{
-			this._itc = telnetClient;
+			//this._itc = telnetClient;
 			this._valuesDict = new ConcurrentDictionary<string, Pair<double, string>>();
 			this._valuesDict["Elevator"] = new Pair<double, string>(double.NaN, "/controls/flight/elevator");
 			this._valuesDict["Throttle"] = new Pair<double, string>(double.NaN, "/controls/engines/current-engine/throttle");
 			this._valuesDict["Aileron"] = new Pair<double, string>(double.NaN, "/controls/flight/aileron");
 			this._valuesDict["Rudder"] = new Pair<double, string>(double.NaN, "/controls/flight/rudder");
-			this._toScreenshot = "http://" + ip + "/:" + httpPort + "/screenshot";
+			this._toScreenshot = "http://" + con["ServerHostIP"] + "/:" + Int32.Parse(con["SimulatorHttpPort"]) + "/screenshot"; 
 			this._queue = new BlockingCollection<AsyncCommand>();
-			this._ip = ip;
-			this._port = httpPort;
+			this._ip = con["ServerHostIP"];
+			this._httpPort = Int32.Parse(con["ServerTcpPort"]);
+			this._tcpPort = Int32.Parse(con["SimulatorHttpPort"]);
 			this._client = new TcpClient();
 			this._http = new HttpClient();
+
+
+			// MAYBE ADD TO HERE: this.Start();
 
 		}
 
@@ -71,17 +76,6 @@ namespace FlightMobileWeb.Servers
 			if (valuesArr.Length == 4)
 			{
 				// check values:
-				/*try
-				{
-					if (this._valuesDict[this._acommand.command.AileronString()].First != Double.Parse(valuesArr[0]))
-						return Result.NotOk;
-				}
-				catch (Exception)
-				{
-					Console.WriteLine("couldn't parse this as a double"); // DEBUGGING PURPUSES
-					return Result.NotOk;
-				}*/
-
 				//RUNNIG WITH FOREACH
 				int i = 0;
 				foreach(Pair<double,string> pair in this._valuesDict.Values)
