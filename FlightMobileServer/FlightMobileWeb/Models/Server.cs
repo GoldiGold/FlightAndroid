@@ -144,7 +144,7 @@ namespace FlightMobileWeb.Servers
 		public void ProccessCommands()
 		{
 			//this._itc.Connect(this._ip, this._port);
-			this._client.Connect(this._ip, this._port);
+			this._client.Connect(this._ip, this._tcpPort);
 			NetworkStream stream = this._client.GetStream();
 			foreach (AsyncCommand cmd in this._queue.GetConsumingEnumerable())
 			{
