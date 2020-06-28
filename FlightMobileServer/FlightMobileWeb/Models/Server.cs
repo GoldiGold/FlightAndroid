@@ -11,7 +11,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FlightMobileWeb.Servers
+namespace FlightMobileWeb.Models
 {
 	public class Server : IFlightServer
 	{
@@ -41,10 +41,10 @@ namespace FlightMobileWeb.Servers
 		{
 			//this._itc = telnetClient;
 			this._valuesDict = new ConcurrentDictionary<string, Pair<double, string>>();
-			this._valuesDict["Elevator"] = new Pair<double, string>(double.NaN, "/controls/flight/elevator");
-			this._valuesDict["Throttle"] = new Pair<double, string>(double.NaN, "/controls/engines/current-engine/throttle");
-			this._valuesDict["Aileron"] = new Pair<double, string>(double.NaN, "/controls/flight/aileron");
-			this._valuesDict["Rudder"] = new Pair<double, string>(double.NaN, "/controls/flight/rudder");
+			this._valuesDict["Elevator"] = new Pair<double, string>(double.PositiveInfinity, "/controls/flight/elevator");
+			this._valuesDict["Throttle"] = new Pair<double, string>(double.PositiveInfinity, "/controls/engines/current-engine/throttle");
+			this._valuesDict["Aileron"] = new Pair<double, string>(double.PositiveInfinity, "/controls/flight/aileron");
+			this._valuesDict["Rudder"] = new Pair<double, string>(double.PositiveInfinity, "/controls/flight/rudder");
 			this._toScreenshot = "http://" + con["ServerHostIP"] + "/:" + Int32.Parse(con["SimulatorHttpPort"]) + "/screenshot"; 
 			this._queue = new BlockingCollection<AsyncCommand>();
 			this._ip = con["ServerHostIP"];
@@ -53,6 +53,8 @@ namespace FlightMobileWeb.Servers
 			this._client = new TcpClient();
 			this._http = new HttpClient();
 
+
+			Console.WriteLine("created a server");
 
 			// MAYBE ADD TO HERE: this.Start();
 
@@ -149,6 +151,8 @@ namespace FlightMobileWeb.Servers
 			foreach (AsyncCommand cmd in this._queue.GetConsumingEnumerable())
 			{
 				//this.command = cmd;
+				Console.WriteLine("the current command is:");
+				this._acommand.command.toStringToConsole();
 				if (this.shouldUpdate(cmd.command))
 				{
 					byte[] sendBuffer = Encoding.ASCII.GetBytes(this.CreateCommandRequests(cmd));//cmmand to buffer; CREATE THE COMMAND IN THIS FUNCTION
@@ -157,6 +161,8 @@ namespace FlightMobileWeb.Servers
 					int nRead = stream.Read(recvBuffer, 0, 1024);
 					Result res = this.CheckIfUpdated(recvBuffer, nRead);
 
+					Console.Write("command after change is:");
+					this._acommand.command.toStringToConsole();
 					cmd.Completion.SetResult(res);
 				}
 			}

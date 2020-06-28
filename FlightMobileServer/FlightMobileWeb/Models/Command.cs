@@ -49,6 +49,11 @@ namespace FlightMobileWeb.Models
         }
 
         public Command() { }
+
+        public void toStringToConsole()
+        {
+            Console.WriteLine($"Aileron: {this.Aileron}, Rudder: {this.Rudder}, Elevator: {this.Elevator}, Throttle: {this.Throttle}");
+        }
     }
 
     public class AsyncCommand

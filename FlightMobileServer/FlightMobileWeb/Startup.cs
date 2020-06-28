@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FlightMobileWeb.Models;
-using FlightMobileWeb.Servers;
+//using FlightMobileWeb.Servers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -32,9 +32,9 @@ namespace FlightMobileWeb
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddControllers();
-			//services.AddSingleton(typeof(IFlightServer), new Server(ConfigurationManager.AppSettings["DEFAULT_IP"], ConfigurationManager.AppSettings["DEFAULT_PORT"];));
-			services.AddSingleton<IFlightServer, Server>();
 			services.AddSingleton<IConfiguration>(Configuration);
+			services.AddSingleton<IFlightServer, Server>();
+
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
