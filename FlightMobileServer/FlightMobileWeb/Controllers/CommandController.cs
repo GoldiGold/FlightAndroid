@@ -31,18 +31,34 @@ namespace FlightMobileWeb.Controllers
 				Console.WriteLine("the command is NULL");
 				return BadRequest("NOT A GOOD JSON COMMAND FILE.");
 			}
-			// TODO: ADD THE AWAIT SEND_COMMAND OF THE SERVER (WITH THE TCP). WE WILL CALL THE SERVER SEND_COMMAND THAT
-			// WILL USE THE TCP IN THE INSIDE. WE WON'T KNOW THE INNER IMPLEMENTATION.
-			Console.WriteLine("The command we got:");
-			c.toStringToConsole();
-			Result asyncCommandTaskResult = await this.ifs.Execute(c);
-			if (asyncCommandTaskResult == Result.Ok)
+			else
 			{
-				return Ok();
+				// TODO: ADD THE AWAIT SEND_COMMAND OF THE SERVER (WITH THE TCP). WE WILL CALL THE SERVER SEND_COMMAND THAT
+				// WILL USE THE TCP IN THE INSIDE. WE WON'T KNOW THE INNER IMPLEMENTATION.
+				Console.WriteLine("The command we got:");
+				c.toStringToConsole();
+				//Result asyncCommandTaskResult = await this.ifs.Execute(c);
+				//Console.WriteLine("the result is: " + asyncCommandTaskResult);
+				if(await this.ifs.Execute(c) == Result.Ok)
+				{
+					Console.WriteLine("its ok nigga");
+					return Ok();
+				} else
+				{
+					Console.WriteLine("what defauk it failed");
+					return StatusCode(500);
+				}
 
-			} else
-			{
-				return StatusCode(500);
+				/*
+				if (asyncCommandTaskResult == Result.Ok)
+				{
+					return Ok();
+
+				}
+				else
+				{
+					return StatusCode(500);
+				}*/
 			}
 		}
 	}

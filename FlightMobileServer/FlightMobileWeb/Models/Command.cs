@@ -52,7 +52,15 @@ namespace FlightMobileWeb.Models
 
         public void toStringToConsole()
         {
-            Console.WriteLine($"Aileron: {this.Aileron}, Rudder: {this.Rudder}, Elevator: {this.Elevator}, Throttle: {this.Throttle}");
+            if (this == null)
+            {
+                Console.WriteLine("this is null boiii");
+            }
+            else
+            {
+                Console.WriteLine($"Aileron: {this.Aileron}, Rudder: {this.Rudder}, Elevator: {this.Elevator}, Throttle: {this.Throttle}");
+
+            }
         }
     }
 

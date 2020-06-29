@@ -24,6 +24,7 @@ namespace FlightMobileWeb
 		public Startup(IConfiguration configuration)
 		{
 			Configuration = configuration;
+			//Console.WriteLine("created singletons?");
 		}
 
 		public IConfiguration Configuration { get; }

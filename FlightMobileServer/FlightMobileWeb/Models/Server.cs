@@ -18,7 +18,7 @@ namespace FlightMobileWeb.Models
 		private AsyncCommand _acommand; // we create it during the sendCommand function (since we need to check the vars have changed.
 										//private TcpClient tcp;  the itc holds the tcp client
 		private HttpClient _http;
-		private ITelnetClient _itc;
+		//private ITelnetClient _itc;
 		private TcpClient _client;
 		private ConcurrentDictionary<string, Pair<double, string>> _valuesDict; //a dictionary build like: <name, <value, path>>.
 		private string _toScreenshot;
@@ -40,23 +40,29 @@ namespace FlightMobileWeb.Models
 		public Server(/*ITelnetClient telnetClient,string ip, int httpPort,*/ IConfiguration con)
 		{
 			//this._itc = telnetClient;
+			this._httpPort = Int32.Parse(con["ServerHttpPort"]);
+			this._tcpPort = Int32.Parse(con["ServerTcpPort"]);
 			this._valuesDict = new ConcurrentDictionary<string, Pair<double, string>>();
-			this._valuesDict["Elevator"] = new Pair<double, string>(double.PositiveInfinity, "/controls/flight/elevator");
-			this._valuesDict["Throttle"] = new Pair<double, string>(double.PositiveInfinity, "/controls/engines/current-engine/throttle");
 			this._valuesDict["Aileron"] = new Pair<double, string>(double.PositiveInfinity, "/controls/flight/aileron");
 			this._valuesDict["Rudder"] = new Pair<double, string>(double.PositiveInfinity, "/controls/flight/rudder");
-			this._toScreenshot = "http://" + con["ServerHostIP"] + "/:" + Int32.Parse(con["SimulatorHttpPort"]) + "/screenshot"; 
+			this._valuesDict["Elevator"] = new Pair<double, string>(double.PositiveInfinity, "/controls/flight/elevator");
+			this._valuesDict["Throttle"] = new Pair<double, string>(double.PositiveInfinity, "/controls/engines/current-engine/throttle");
+			this._toScreenshot = "http://" + con["ServerHostIP"] + "/:" + this._httpPort + "/screenshot";
 			this._queue = new BlockingCollection<AsyncCommand>();
 			this._ip = con["ServerHostIP"];
-			this._httpPort = Int32.Parse(con["ServerTcpPort"]);
-			this._tcpPort = Int32.Parse(con["SimulatorHttpPort"]);
 			this._client = new TcpClient();
 			this._http = new HttpClient();
+			this._acommand = new AsyncCommand(new Command());// creates a defult asyncCommand ( with infinities)
+			this._acommand.command.Aileron = this.Aileron;
+			this._acommand.command.Rudder = this.Rudder;
+			this._acommand.command.Elevator = this.Elevator;
+			this._acommand.command.Throttle = this.Throttle;
 
 
 			Console.WriteLine("created a server");
 
-			// MAYBE ADD TO HERE: this.Start();
+			/*MAYBE ADD TO HERE: */
+			this.Start();
 
 		}
 
@@ -74,32 +80,74 @@ namespace FlightMobileWeb.Models
 		public Result CheckIfUpdated(byte[] buffer, int length)
 		{
 			string allValues = Encoding.ASCII.GetString(buffer);
-			string[] valuesArr = allValues.Split('\n');
-			if (valuesArr.Length == 4)
+			Console.WriteLine("output from server: " + allValues);
+			string[] valuesArr = System.Text.RegularExpressions.Regex.Split(allValues, "\n");
+			Console.WriteLine("the arr length is:" + valuesArr.Length);
+			if (valuesArr.Length == 5)//the last one is empty since we finish the text with \n
 			{
 				// check values:
 				//RUNNIG WITH FOREACH
+				Console.WriteLine("started comparing");
 				int i = 0;
-				foreach(Pair<double,string> pair in this._valuesDict.Values)
+				/*foreach (Pair<double, string> pair in this._valuesDict.Values)
+				{*/
+				Console.WriteLine($"comparing between Aileron and the value: {valuesArr[i]}");
+				try
 				{
-					try
-					{
-						if (pair.First != Double.Parse(valuesArr[i]))
-						{
-							return Result.NotOk;
-						}
-					}
-					catch (Exception)
-					{
-						Console.WriteLine("couldn't parse this as a double"); // DEBUGGING PURPUSES
+					if (this.Aileron != Double.Parse(valuesArr[i]))
 						return Result.NotOk;
-					}
-					++i;
 				}
+				catch (Exception)
+				{
+					Console.WriteLine("couldn't parse this as a double"); // DEBUGGING PURPUSES
+					return Result.NotOk;
+				}
+				++i;
+
+				Console.WriteLine($"comparing between Rudder and the value: {valuesArr[i]}");
+				try
+				{
+					if (this.Rudder != Double.Parse(valuesArr[i]))
+						return Result.NotOk;
+				}
+				catch (Exception)
+				{
+					Console.WriteLine("couldn't parse this as a double"); // DEBUGGING PURPUSES
+					return Result.NotOk;
+				}
+				++i;
+
+				Console.WriteLine($"comparing between Elevator and the value: {valuesArr[i]}");
+				try
+				{
+					if (this.Elevator != Double.Parse(valuesArr[i]))
+						return Result.NotOk;
+				}
+				catch (Exception)
+				{
+					Console.WriteLine("couldn't parse this as a double"); // DEBUGGING PURPUSES
+					return Result.NotOk;
+				}
+				++i;
+
+				Console.WriteLine($"comparing between Throttle and the value: {valuesArr[i]}");
+				try
+				{
+					if (this.Throttle != Double.Parse(valuesArr[i]))
+						return Result.NotOk;
+				}
+				catch (Exception)
+				{
+					Console.WriteLine("couldn't parse this as a double"); // DEBUGGING PURPUSES
+					return Result.NotOk;
+				}
+				//++i;
+				//}
 				return Result.Ok; // EQUAL IN ALL THE VALUES.
 			}
 			else
 			{
+				Console.WriteLine("the length is not 4");
 				return Result.NotOk; //DIDN'T GET ENOUGHT PARAMETERS FROM THE FG SERVER ALTHOUGH ESKEF FOR 4.
 			}
 
@@ -129,18 +177,20 @@ namespace FlightMobileWeb.Models
 		/// <returns> a string of the message we send to the FG server through TCP.</returns>
 		public string CreateCommandRequests(AsyncCommand cmd)
 		{
-				this.updateDictFromCommand(cmd);
-				string send = "";
-				send += $"set {this._valuesDict[cmd.command.AileronString()].Second} {this.Aileron}\r\n";
-				send += $"set {this._valuesDict[cmd.command.ThrottleString()].Second} {this.Throttle}\r\n";
-				send += $"set {this._valuesDict[cmd.command.ElevatorString()].Second} {this.Elevator}\r\n";
-				send += $"set {this._valuesDict[cmd.command.RudderString()].Second} {this.Rudder}\r\n";
-				send += $"get {this._valuesDict[cmd.command.AileronString()].Second} \r\n"; //GETTING THE VALUE OF THE PROPERTY
-				send += $"get {this._valuesDict[cmd.command.ThrottleString()].Second} \r\n";
-				send += $"get {this._valuesDict[cmd.command.ElevatorString()].Second} \r\n";
-				send += $"get {this._valuesDict[cmd.command.RudderString()].Second} \n";
+			this.updateDictFromCommand(cmd);
+			string send = "";
+			send += $"set {this._valuesDict[cmd.command.AileronString()].Second} {this.Aileron}\r\n";
+			send += $"set {this._valuesDict[cmd.command.RudderString()].Second} {this.Rudder}\r\n";
+			send += $"set {this._valuesDict[cmd.command.ElevatorString()].Second} {this.Elevator}\r\n";
+			send += $"set {this._valuesDict[cmd.command.ThrottleString()].Second} {this.Throttle}\r\n";
+			send += $"get {this._valuesDict[cmd.command.AileronString()].Second} \r\n"; //GETTING THE VALUE OF THE PROPERTY
+			send += $"get {this._valuesDict[cmd.command.RudderString()].Second} \n";
+			send += $"get {this._valuesDict[cmd.command.ElevatorString()].Second} \r\n";
+			send += $"get {this._valuesDict[cmd.command.ThrottleString()].Second} \r\n";
 
-				return send;
+			Console.WriteLine("Message is: " + send);
+
+			return send;
 		}
 
 		public void ProccessCommands()
@@ -148,6 +198,7 @@ namespace FlightMobileWeb.Models
 			//this._itc.Connect(this._ip, this._port);
 			this._client.Connect(this._ip, this._tcpPort);
 			NetworkStream stream = this._client.GetStream();
+			stream.Write(Encoding.ASCII.GetBytes("data\n", 0, "data\n".Length));
 			foreach (AsyncCommand cmd in this._queue.GetConsumingEnumerable())
 			{
 				//this.command = cmd;
@@ -158,12 +209,21 @@ namespace FlightMobileWeb.Models
 					byte[] sendBuffer = Encoding.ASCII.GetBytes(this.CreateCommandRequests(cmd));//cmmand to buffer; CREATE THE COMMAND IN THIS FUNCTION
 					byte[] recvBuffer = new byte[1024];
 					stream.Write(sendBuffer, 0, sendBuffer.Length);
-					int nRead = stream.Read(recvBuffer, 0, 1024);
+					int nRead;
+					do
+					{
+						nRead = stream.Read(recvBuffer, 0, 1024);
+						Console.WriteLine("tried to read");
+					} while (nRead == 0);
 					Result res = this.CheckIfUpdated(recvBuffer, nRead);
-
-					Console.Write("command after change is:");
+					Console.WriteLine("the res after checking update: " + res);
+					Console.WriteLine("command after change is:");
 					this._acommand.command.toStringToConsole();
 					cmd.Completion.SetResult(res);
+				}
+				else
+				{
+					cmd.Completion.SetResult(Result.Ok);//We just don't need to upadet it's fine.
 				}
 			}
 		}
@@ -174,7 +234,7 @@ namespace FlightMobileWeb.Models
 			this._queue.Add(asyncCommand);
 			return asyncCommand.Task;
 		}
-		public void start()
+		public void Start()
 		{
 			Task.Factory.StartNew(ProccessCommands);
 		}
