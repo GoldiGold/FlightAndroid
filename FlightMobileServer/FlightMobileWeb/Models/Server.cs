@@ -1,5 +1,6 @@
 ﻿using FlightMobileWeb.Model;
 using FlightMobileWeb.Models;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Concurrent;
@@ -77,24 +78,28 @@ namespace FlightMobileWeb.Models
 		/// <param name="buffer"> the string response from the tcp server that holds the 4 currently values.</param>
 		/// <param name="length"> the length of the buffer </param>
 		/// <returns></returns>
-		public Result CheckIfUpdated(byte[] buffer, int length)
+		public Result CheckIfUpdated(/*byte[] buffer, int length*/ NetworkStream stream)
 		{
-			string allValues = Encoding.ASCII.GetString(buffer);
+			/*string allValues = Encoding.ASCII.GetString(buffer);
 			Console.WriteLine("output from server: " + allValues);
 			string[] valuesArr = System.Text.RegularExpressions.Regex.Split(allValues, "\n");
 			Console.WriteLine("the arr length is:" + valuesArr.Length);
 			if (valuesArr.Length == 5)//the last one is empty since we finish the text with \n
-			{
+			{*/
+			byte[] recvBuffer = new byte[1024];
 				// check values:
 				//RUNNIG WITH FOREACH
 				Console.WriteLine("started comparing");
 				int i = 0;
-				/*foreach (Pair<double, string> pair in this._valuesDict.Values)
-				{*/
-				Console.WriteLine($"comparing between Aileron and the value: {valuesArr[i]}");
+			/*foreach (Pair<double, string> pair in this._valuesDict.Values)
+			{*/
+			byte[] sendMessage =Encoding.ASCII.GetBytes($"get {this._valuesDict[this._acommand.command.AileronString()].Second}\n");
+			stream.Write(sendMessage, 0, sendMessage.Length);
+			stream.Read(recvBuffer, 0, 1024);
+				Console.WriteLine($"comparing between Aileron and the value: {Encoding.ASCII.GetString(recvBuffer)}");
 				try
 				{
-					if (this.Aileron != Double.Parse(valuesArr[i]))
+					if (this.Aileron != Double.Parse(Encoding.ASCII.GetString(recvBuffer)))
 						return Result.NotOk;
 				}
 				catch (Exception)
@@ -103,11 +108,14 @@ namespace FlightMobileWeb.Models
 					return Result.NotOk;
 				}
 				++i;
-
-				Console.WriteLine($"comparing between Rudder and the value: {valuesArr[i]}");
+			sendMessage = Encoding.ASCII.GetBytes($"get {this._valuesDict[this._acommand.command.RudderString()].Second}\n");
+			stream.Write(sendMessage, 0, sendMessage.Length);
+			recvBuffer = new byte[1024];
+			stream.Read(recvBuffer, 0, 1024);
+				Console.WriteLine($"comparing between Rudder and the value: {Encoding.ASCII.GetString(recvBuffer)}");
 				try
 				{
-					if (this.Rudder != Double.Parse(valuesArr[i]))
+					if (this.Rudder != Double.Parse(Encoding.ASCII.GetString(recvBuffer)))
 						return Result.NotOk;
 				}
 				catch (Exception)
@@ -116,11 +124,14 @@ namespace FlightMobileWeb.Models
 					return Result.NotOk;
 				}
 				++i;
-
-				Console.WriteLine($"comparing between Elevator and the value: {valuesArr[i]}");
+			sendMessage = Encoding.ASCII.GetBytes($"get {this._valuesDict[this._acommand.command.ElevatorString()].Second}\n");
+			stream.Write(sendMessage, 0, sendMessage.Length);
+			recvBuffer = new byte[1024];
+			stream.Read(recvBuffer, 0, 1024);
+				Console.WriteLine($"comparing between Elevator and the value: {Encoding.ASCII.GetString(recvBuffer)}");
 				try
 				{
-					if (this.Elevator != Double.Parse(valuesArr[i]))
+					if (this.Elevator != Double.Parse(Encoding.ASCII.GetString(recvBuffer)))
 						return Result.NotOk;
 				}
 				catch (Exception)
@@ -129,11 +140,14 @@ namespace FlightMobileWeb.Models
 					return Result.NotOk;
 				}
 				++i;
-
-				Console.WriteLine($"comparing between Throttle and the value: {valuesArr[i]}");
+			sendMessage = Encoding.ASCII.GetBytes($"get {this._valuesDict[this._acommand.command.ThrottleString()].Second}\n");
+			stream.Write(sendMessage, 0, sendMessage.Length);
+			recvBuffer = new byte[1024];
+			stream.Read(recvBuffer, 0, 1024);
+				Console.WriteLine($"comparing between Throttle and the value: {Encoding.ASCII.GetString(recvBuffer)}");
 				try
 				{
-					if (this.Throttle != Double.Parse(valuesArr[i]))
+					if (this.Throttle != Double.Parse(Encoding.ASCII.GetString(recvBuffer)))
 						return Result.NotOk;
 				}
 				catch (Exception)
@@ -144,12 +158,12 @@ namespace FlightMobileWeb.Models
 				//++i;
 				//}
 				return Result.Ok; // EQUAL IN ALL THE VALUES.
-			}
-			else
+			
+			/*else
 			{
-				Console.WriteLine("the length is not 4");
+				Console.WriteLine("the length is not 5");
 				return Result.NotOk; //DIDN'T GET ENOUGHT PARAMETERS FROM THE FG SERVER ALTHOUGH ESKEF FOR 4.
-			}
+			}*/
 
 		}
 
@@ -175,20 +189,20 @@ namespace FlightMobileWeb.Models
 		/// </summary>
 		/// <param name="cmd"> the Async command we get and exert the properties from.</param>
 		/// <returns> a string of the message we send to the FG server through TCP.</returns>
-		public string CreateCommandRequests(AsyncCommand cmd)
+		public string CreateCommandSet(AsyncCommand cmd)
 		{
 			this.updateDictFromCommand(cmd);
 			string send = "";
 			send += $"set {this._valuesDict[cmd.command.AileronString()].Second} {this.Aileron}\r\n";
 			send += $"set {this._valuesDict[cmd.command.RudderString()].Second} {this.Rudder}\r\n";
 			send += $"set {this._valuesDict[cmd.command.ElevatorString()].Second} {this.Elevator}\r\n";
-			send += $"set {this._valuesDict[cmd.command.ThrottleString()].Second} {this.Throttle}\r\n";
-			send += $"get {this._valuesDict[cmd.command.AileronString()].Second} \r\n"; //GETTING THE VALUE OF THE PROPERTY
+			send += $"set {this._valuesDict[cmd.command.ThrottleString()].Second} {this.Throttle}\n";
+			/*send += $"get {this._valuesDict[cmd.command.AileronString()].Second} \r\n"; //GETTING THE VALUE OF THE PROPERTY
 			send += $"get {this._valuesDict[cmd.command.RudderString()].Second} \n";
 			send += $"get {this._valuesDict[cmd.command.ElevatorString()].Second} \r\n";
-			send += $"get {this._valuesDict[cmd.command.ThrottleString()].Second} \r\n";
+			send += $"get {this._valuesDict[cmd.command.ThrottleString()].Second} \r\n";*/
 
-			Console.WriteLine("Message is: " + send);
+			//Console.WriteLine("Message is: " + send);
 
 			return send;
 		}
@@ -202,23 +216,23 @@ namespace FlightMobileWeb.Models
 			foreach (AsyncCommand cmd in this._queue.GetConsumingEnumerable())
 			{
 				//this.command = cmd;
-				Console.WriteLine("the current command is:");
-				this._acommand.command.toStringToConsole();
+				//Console.WriteLine("the current command is:");
+				//this._acommand.command.toStringToConsole();
 				if (this.shouldUpdate(cmd.command))
 				{
-					byte[] sendBuffer = Encoding.ASCII.GetBytes(this.CreateCommandRequests(cmd));//cmmand to buffer; CREATE THE COMMAND IN THIS FUNCTION
-					byte[] recvBuffer = new byte[1024];
+					byte[] sendBuffer = Encoding.ASCII.GetBytes(this.CreateCommandSet(cmd));//cmmand to buffer; CREATE THE COMMAND IN THIS FUNCTION
+					//byte[] recvBuffer = new byte[1024];
 					stream.Write(sendBuffer, 0, sendBuffer.Length);
-					int nRead;
-					do
+					//int nRead = stream.Read(recvBuffer, 0, 1024);
+					/*do
 					{
 						nRead = stream.Read(recvBuffer, 0, 1024);
 						Console.WriteLine("tried to read");
-					} while (nRead == 0);
-					Result res = this.CheckIfUpdated(recvBuffer, nRead);
+					} while (nRead == 0);*/
+					Result res = this.CheckIfUpdated(stream);
 					Console.WriteLine("the res after checking update: " + res);
-					Console.WriteLine("command after change is:");
-					this._acommand.command.toStringToConsole();
+					//Console.WriteLine("command after change is:");
+					//this._acommand.command.toStringToConsole();
 					cmd.Completion.SetResult(res);
 				}
 				else
