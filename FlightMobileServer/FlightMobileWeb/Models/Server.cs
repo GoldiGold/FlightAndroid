@@ -43,14 +43,15 @@ namespace FlightMobileWeb.Models
 			//this._itc = telnetClient;
 			this._httpPort = Int32.Parse(con["ServerHttpPort"]);
 			this._tcpPort = Int32.Parse(con["ServerTcpPort"]);
+			this._ip = con["ServerHostIP"];
+
 			this._valuesDict = new ConcurrentDictionary<string, Pair<double, string>>();
 			this._valuesDict["Aileron"] = new Pair<double, string>(double.PositiveInfinity, "/controls/flight/aileron");
 			this._valuesDict["Rudder"] = new Pair<double, string>(double.PositiveInfinity, "/controls/flight/rudder");
 			this._valuesDict["Elevator"] = new Pair<double, string>(double.PositiveInfinity, "/controls/flight/elevator");
 			this._valuesDict["Throttle"] = new Pair<double, string>(double.PositiveInfinity, "/controls/engines/current-engine/throttle");
-			this._toScreenshot = "http://" + con["ServerHostIP"] + "/:" + this._httpPort + "/screenshot";
+			this._toScreenshot = "http://" + this._ip + ":" + this._httpPort + "/screenshot";
 			this._queue = new BlockingCollection<AsyncCommand>();
-			this._ip = con["ServerHostIP"];
 			this._client = new TcpClient();
 			this._http = new HttpClient();
 			this._acommand = new AsyncCommand(new Command());// creates a defult asyncCommand ( with infinities)
