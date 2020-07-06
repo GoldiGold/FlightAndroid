@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
+using System.Net.Http;
 
 namespace FlightMobileWeb.Models
 {
@@ -38,7 +39,9 @@ namespace FlightMobileWeb.Models
 
 		void Start();
 
+		HttpClient Http { get; }
 
+		string ToScreenShot { get; }
 
 	}
 }

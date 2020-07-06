@@ -1,6 +1,7 @@
 ﻿using FlightMobileWeb.Model;
 using FlightMobileWeb.Models;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Concurrent;
@@ -326,6 +327,9 @@ namespace FlightMobileWeb.Models
 			}
 		}
 
+		public HttpClient Http { get => this._http; }
+
+		public string ToScreenShot { get => this._toScreenshot; }
 	}
 
 	public class Pair<T, U>
