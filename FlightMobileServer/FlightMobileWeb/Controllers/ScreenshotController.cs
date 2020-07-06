@@ -24,9 +24,11 @@ namespace FlightMobileWeb.Controllers
         [HttpGet]
         public async Task<ActionResult> GetScreenshot()
         {
-            byte[] response = await new HttpClient().GetByteArrayAsync(ifs.ToScreenShot);//await this.ifs.GetScreenShot();
+            var resp = await ifs.Http.GetAsync(ifs.ToScreenShot);
+            byte[] response = await resp.Content.ReadAsByteArrayAsync();
+            //byte[] response = await new HttpClient().GetByteArrayAsync(ifs.ToScreenShot);//await this.ifs.GetScreenShot();
             if (response != null) //success
-                return File(response, "image/jpg"); //200 Ok  + the image
+                return File(response, "image/jpeg"); //200 Ok  + the image
             return BadRequest();
         }
 
