@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using FlightMobileWeb.Models;
 using Microsoft.AspNetCore.Http;
@@ -23,7 +24,7 @@ namespace FlightMobileWeb.Controllers
         [HttpGet]
         public async Task<ActionResult> GetScreenshot()
         {
-            byte[] response = await ifs.Http.GetByteArrayAsync(ifs.ToScreenShot);//await this.ifs.GetScreenShot();
+            byte[] response = await new HttpClient().GetByteArrayAsync(ifs.ToScreenShot);//await this.ifs.GetScreenShot();
             if (response != null) //success
                 return File(response, "image/jpg"); //200 Ok  + the image
             return BadRequest();
