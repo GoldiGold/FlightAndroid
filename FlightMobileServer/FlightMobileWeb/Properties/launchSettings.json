@@ -18,13 +18,13 @@
       }
     },
     "FlightMobileWeb": {
-      "commandName": "Project",
-      "launchBrowser": false,
-      "launchUrl": "weatherforecast",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "https://localhost:5001"
+        "commandName": "Project",
+        "launchBrowser": true,
+        "launchUrl": "weatherforecast",
+        "environmentVariables": {
+            "ASPNETCORE_ENVIRONMENT": "Development"
+        },
+        "applicationUrl": "https://127.0.0.1:5001;https://127.0.0.1:51121"
     }
   }
 }
