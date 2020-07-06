@@ -342,3 +342,4 @@ namespace FlightMobileWeb.Models
 		public U Second { get; set; }
 	};
 }
+// end if class.
