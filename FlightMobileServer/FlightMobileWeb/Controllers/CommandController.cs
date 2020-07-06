@@ -41,7 +41,7 @@ namespace FlightMobileWeb.Controllers
 				//Console.WriteLine("the result is: " + asyncCommandTaskResult);
 				if(await this.ifs.Execute(c) == Result.Ok)
 				{
-					Console.WriteLine("its ok nigga");
+					//Console.WriteLine("its ok nigga");
 					return Ok();
 				} else
 				{
