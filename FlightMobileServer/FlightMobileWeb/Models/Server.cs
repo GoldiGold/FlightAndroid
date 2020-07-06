@@ -267,7 +267,15 @@ namespace FlightMobileWeb.Models
 		public async Task<byte[]> GetScreenShot()
 		{
 			//throw new NotImplementedException();
-			return await this._http.GetByteArrayAsync(this._toScreenshot);
+			try
+			{
+				byte[] resp = await this._http.GetByteArrayAsync(this._toScreenshot);
+				return resp;
+			}
+			catch
+			{
+				return null;
+			}
 		}
 
 		public bool ConnectToServer()
