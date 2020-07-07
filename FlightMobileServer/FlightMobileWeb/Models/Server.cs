@@ -220,8 +220,8 @@ namespace FlightMobileWeb.Models
 				//this.command = cmd;
 				//Console.WriteLine("the current command is:");
 				//this._acommand.command.toStringToConsole();
-				if (this.shouldUpdate(cmd.command))
-				{
+				//if (this.shouldUpdate(cmd.command))
+				//{
 					byte[] sendBuffer = Encoding.ASCII.GetBytes(this.CreateCommandSet(cmd));//cmmand to buffer; CREATE THE COMMAND IN THIS FUNCTION
 					//byte[] recvBuffer = new byte[1024];
 					stream.Write(sendBuffer, 0, sendBuffer.Length);
@@ -236,11 +236,11 @@ namespace FlightMobileWeb.Models
 					//Console.WriteLine("command after change is:");
 					//this._acommand.command.toStringToConsole();
 					cmd.Completion.SetResult(res);
-				}
+				/*}
 				else
 				{
 					cmd.Completion.SetResult(Result.Ok);//We just don't need to upadet it's fine.
-				}
+				}*/
 			}
 		}
 
