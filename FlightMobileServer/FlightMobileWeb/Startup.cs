@@ -14,8 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.ComponentModel;
-
-
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace FlightMobileWeb
 {
@@ -32,6 +31,7 @@ namespace FlightMobileWeb
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.Configure<KestrelServerOptions>(Configuration.GetSection("Kestrel"));
 			services.AddControllers();
 			services.AddSingleton<IConfiguration>(Configuration);
 			services.AddSingleton<IFlightServer, Server>();
