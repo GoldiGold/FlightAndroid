@@ -13,9 +13,9 @@
       "commandName": "IISExpress",
       "launchBrowser": false,
       "launchUrl": "weatherforecast",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "environmentVariables": {
+            "ASPNETCORE_ENVIRONMENT": "Development"
+        }
     },
     "FlightMobileWeb": {
         "commandName": "Project",

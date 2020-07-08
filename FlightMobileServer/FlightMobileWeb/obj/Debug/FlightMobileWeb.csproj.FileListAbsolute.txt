@@ -7,8 +7,8 @@ C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\out\Fligh
 C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\out\FlightMobileWeb.runtimeconfig.dev.json
 C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\out\FlightMobileWeb.dll
 C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\out\FlightMobileWeb.pdb
-C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\FlightMobileWeb\obj\Debug\FlightMobileWeb.csprojAssemblyReference.cache
 C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\FlightMobileWeb\obj\Debug\FlightMobileWeb.csproj.CoreCompileInputs.cache
+C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\FlightMobileWeb\obj\Debug\FlightMobileWeb.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\FlightMobileWeb\obj\Debug\FlightMobileWeb.AssemblyInfoInputs.cache
 C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\FlightMobileWeb\obj\Debug\FlightMobileWeb.AssemblyInfo.cs
 C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\FlightMobileWeb\obj\Debug\FlightMobileWeb.RazorTargetAssemblyInfo.cache
@@ -18,4 +18,3 @@ C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\FlightMob
 C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\FlightMobileWeb\obj\Debug\FlightMobileWeb.dll
 C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\FlightMobileWeb\obj\Debug\FlightMobileWeb.pdb
 C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\FlightMobileWeb\obj\Debug\FlightMobileWeb.genruntimeconfig.cache
-C:\Users\Chen Goldshtein\source\repos\FlightAndroid\FlightMobileServer\FlightMobileWeb\obj\Debug\FlightMobileWeb.MvcApplicationPartsAssemblyInfo.cache
